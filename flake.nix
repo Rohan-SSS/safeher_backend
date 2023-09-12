@@ -28,6 +28,7 @@
       modules = [
         {
           services.postgres.enable = true;
+          services.postgres.listen_addresses = "127.0.0.1";
           services.postgres.initialDatabases = [
             {name = "womenProtection";}
           ];

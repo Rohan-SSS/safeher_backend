@@ -118,10 +118,13 @@ def login_user(user: schemas.UserLogin, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user.email)
     if not db_user:
         raise HTTPException(status_code=400, detail="User is not registered")
+
+    # check if password matches
     if not bcrypt.checkpw(
-        user.password.encode("utf-8"), bytes(str(db_user.hashed_password), "utf-8")
+        user.password.encode("utf-8"), str(db_user.hashed_password).encode("utf-8")
     ):
         raise HTTPException(status_code=400, detail="User credentials invalid")
+
     return db_user
 
 

@@ -1,16 +1,14 @@
 from sqlalchemy import (
     TIMESTAMP,
-    Boolean,
     Column,
     ForeignKey,
     Integer,
     String,
     Text,
     func,
+    BOOLEAN,
 )
 from sqlalchemy.orm import relationship
-from sqlalchemy.types import BOOLEAN, LargeBinary
-
 from database import Base
 
 
@@ -20,8 +18,8 @@ class User(Base):
     user_id = Column(Integer, primary_key=True)
     email = Column(String, unique=True, index=True, nullable=False)
     name = Column(String, nullable=False)
-    hashed_password = Column(LargeBinary)
-    is_teacher = Column(BOOLEAN, default=False)
+    hashed_password = Column(Text, nullable=False)
+    is_teacher = Column(BOOLEAN, default=False, nullable=False)
     phone_number = Column(String, nullable=False)
 
     community_messages = relationship(
@@ -42,7 +40,7 @@ class CommunityChatMessage(Base):
 
     message_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
-    message_text = Column(Text)
+    message_text = Column(Text, nullable=False)
     created_at = Column("created_at", TIMESTAMP, server_default=func.now())
 
 
@@ -52,7 +50,7 @@ class Ticket(Base):
     ticket_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     teacher_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
-    is_open = Column(Boolean)
+    is_open = Column(BOOLEAN, default=True, nullable=False)
     ticket_chat_messages = relationship("TicketChatMessage", backref="ticket")
 
 
@@ -62,5 +60,5 @@ class TicketChatMessage(Base):
     message_id = Column(Integer, primary_key=True)
     ticket_id = Column(Integer, ForeignKey("tickets.ticket_id"), nullable=False)
     user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
-    message_text = Column(Text)
+    message_text = Column(Text, nullable=False)
     created_at = Column("created_at", TIMESTAMP, server_default=func.now())

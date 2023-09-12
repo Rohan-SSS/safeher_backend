@@ -8,7 +8,8 @@ password = os.environ.get("DATABASE_PASSWORD")
 host = os.environ.get("DATABASE_HOST")
 name = os.environ.get("DATABASE_NAME")
 if host is None or password is None or role is None or name is None:
-    SQLALCHEMY_DATABASE_URL = "postgresql://root@127.0.0.1/womenProtection"
+    user = os.getlogin()
+    SQLALCHEMY_DATABASE_URL = f"postgresql://{user}@localhost/womenProtection"
 else:
     SQLALCHEMY_DATABASE_URL = f"postgresql://{role}:{password}@{host}/{name}"
 engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True)
