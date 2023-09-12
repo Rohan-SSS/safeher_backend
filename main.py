@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, Set
 import bcrypt
 from fastapi import (
     FastAPI,
@@ -33,6 +33,11 @@ clients: list[WebSocket] = []
 async def community_chat_endpoint(
     websocket: WebSocket, user_id: int, db: Session = Depends(get_db)
 ):
+    # Check if user exists
+    user = crud.get_user(db, user_id)
+    if not user:
+        return
+
     await websocket.accept()
     clients.append(websocket)
 
@@ -59,7 +64,7 @@ async def community_chat_endpoint(
         clients.remove(websocket)
 
 
-ticket_chats: Dict[int, List[WebSocket]] = {}
+ticket_chats: Dict[int, Set[WebSocket]] = {}
 
 
 @app.websocket("/ws/{ticket_id}/{user_id}")
@@ -77,7 +82,7 @@ async def ticket_chat_endpoint(
         return
 
     await websocket.accept()
-    ticket_chats[ticket_id].append(websocket)
+    ticket_chats.setdefault(ticket_id, set()).add(websocket)
 
     try:
         while True:
@@ -129,7 +134,7 @@ def login_user(user: schemas.UserLogin, db: Session = Depends(get_db)):
 
 
 @app.post("/tickets/create/")
-def create_ticket(ticket: schemas.TicketCreate, db: Session = Depends(get_db)):
+def create_ticket(ticket: schemas.TicketBase, db: Session = Depends(get_db)):
     teacher_id = crud.get_user_with_min_open_tickets(db)
     if teacher_id:
         return crud.create_ticket(db, ticket.user_id, teacher_id)
@@ -160,12 +165,17 @@ def get_ticket_messages(ticket_id: int, db: Session = Depends(get_db)):
     return crud.get_ticket_messages(db, ticket_id)
 
 
-@app.get("/tickets/", response_model=list[schemas.Ticket])
-def read_open_tickets(db: Session = Depends(get_db)):
-    return crud.get_open_tickets(db)
+@app.get("/tickets/{user_id}", response_model=list[schemas.Ticket])
+def read_open_user_tickets(user_id: int, db: Session = Depends(get_db)):
+    return crud.get_open_user_tickets(db, user_id)
 
 
 @app.get("/users/", response_model=list[schemas.User])
 def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     users = crud.get_users(db, skip=skip, limit=limit)
     return users
+
+
+@app.get("/community_chat/messages/", response_model=list[schemas.CommunityChatMessage])
+def get_community_chat_messages(db: Session = Depends(get_db)):
+    return crud.get_community_chat_messages(db)

@@ -40,6 +40,9 @@ class Ticket(TicketBase):
     teacher_id: int
     is_open: bool
 
+    class Config:
+        from_attributes = True
+
 
 # TicketChatMessage
 class TickerChatMessageBase(BaseModel):
@@ -53,7 +56,10 @@ class TicketChatMessageCreate(TickerChatMessageBase):
 
 class TicketChatMessage(TickerChatMessageBase):
     message_id: int
-    timestamp: datetime
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
 
 
 class CommunityChatMessageBase(BaseModel):
@@ -67,4 +73,7 @@ class CommunityChatMessageCreate(CommunityChatMessageBase):
 
 class CommunityChatMessage(CommunityChatMessageBase):
     message_id: int
-    timestamp: datetime
+    created_at: datetime
+
+    class Config:
+        from_attributes = True

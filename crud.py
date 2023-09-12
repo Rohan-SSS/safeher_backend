@@ -7,7 +7,7 @@ import models, schemas
 
 
 def get_user(db: Session, user_id: int):
-    return db.query(models.User).filter(models.User.id == user_id).first()
+    return db.query(models.User).filter(models.User.user_id == user_id).first()
 
 
 def get_user_by_email(db: Session, email: str):
@@ -131,8 +131,15 @@ def get_ticket(db: Session, ticket_id: int):
     return db.query(models.Ticket).filter(models.Ticket.ticket_id == ticket_id).first()
 
 
-def get_open_tickets(db: Session):
-    return db.query(models.Ticket).filter(models.Ticket.is_open == True).all()
+def get_open_user_tickets(db: Session, user_id: int):
+    return (
+        db.query(models.Ticket)
+        .filter(
+            models.Ticket.is_open == True,
+            (models.Ticket.user_id == user_id) | (models.Ticket.teacher_id == user_id),
+        )
+        .all()
+    )
 
 
 def get_ticket_messages(db: Session, ticket_id: int):
