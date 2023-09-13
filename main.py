@@ -148,7 +148,14 @@ def create_ticket(ticket: schemas.TicketBase, db: Session = Depends(get_db)):
 @app.patch("/tickets/close/{ticket_id}")
 def close_ticket(ticket_id: int, db: Session = Depends(get_db)):
     # Remove the ticket_id from ticket_chats as well
-    del ticket_chats[ticket_id]
+    ticket = crud.get_ticket(db, ticket_id)
+    if not ticket:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Ticket not found",
+        )
+
+    ticket_chats.pop(ticket_id, None)
     return crud.close_ticket(db, ticket_id)
 
 
