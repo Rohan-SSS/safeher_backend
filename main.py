@@ -55,6 +55,7 @@ async def community_chat_endpoint(
                 await client.send_json(
                     {
                         "user_id": str(message_db_resp.user_id),
+                        "message_id": str(message_db_resp.message_id),
                         "message": str(message_db_resp.message_text),
                         "created_at": str(message_db_resp.created_at),
                     }
