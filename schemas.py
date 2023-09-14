@@ -77,3 +77,11 @@ class CommunityChatMessage(CommunityChatMessageBase):
 
     class Config:
         from_attributes = True
+
+
+class ChatbotRequest(BaseModel):
+    message: str
+
+
+class ChatbotResponse(BaseModel):
+    response: str

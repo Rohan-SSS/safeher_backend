@@ -8,13 +8,18 @@ from fastapi import (
     status,
 )
 from sqlalchemy.orm import Session
-import models, schemas, crud
+
+import models, schemas, crud, chatBot
+
+from schemas import *
+
 from database import SessionLocal, engine
+
+
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(swagger_ui_parameters={"syntaxHighlight": True})
-
 
 # Dependency
 def get_db():
@@ -187,3 +192,11 @@ def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 @app.get("/community_chat/messages/", response_model=list[schemas.CommunityChatMessage])
 def get_community_chat_messages(db: Session = Depends(get_db)):
     return crud.get_community_chat_messages(db)
+
+
+@app.post("/chatbot/", response_model=ChatbotResponse)
+def chat_with_bot(request: ChatbotRequest):
+    response_message = chatBot.get_answer(request.message)
+    return {"response": response_message}
+
+
