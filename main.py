@@ -48,7 +48,7 @@ async def community_chat_endpoint(
     try:
         while True:
             message = await websocket.receive_text()
-            message_db_resp = crud.create_community_chat_message(
+            chat_message, user = crud.create_community_chat_message(
                 db=db,
                 message=schemas.CommunityChatMessageCreate(
                     message_text=message, user_id=user_id
@@ -58,10 +58,13 @@ async def community_chat_endpoint(
             for client in clients:
                 await client.send_json(
                     {
-                        "user_id": str(message_db_resp.user_id),
-                        "message_id": str(message_db_resp.message_id),
-                        "message_text": str(message_db_resp.message_text),
-                        "created_at": str(message_db_resp.created_at),
+                        "user": {
+                            "user_id": str(chat_message.user_id),
+                            "name": str(user.name),
+                        },
+                        "message_id": str(chat_message.message_id),
+                        "message_text": str(chat_message.message_text),
+                        "created_at": str(chat_message.created_at),
                     }
                 )
 
@@ -92,7 +95,7 @@ async def ticket_chat_endpoint(
     try:
         while True:
             message = await websocket.receive_text()
-            message_db_resp = crud.create_ticket_message(
+            ticket_message, user = crud.create_ticket_message(
                 db=db,
                 message=schemas.TicketChatMessageCreate(
                     ticket_id=ticket_id, message_text=message, user_id=user_id
@@ -101,10 +104,13 @@ async def ticket_chat_endpoint(
             for client in ticket_chats[ticket_id]:
                 await client.send_json(
                     {
-                        "message_id": str(message_db_resp.message_id),
-                        "user_id": str(message_db_resp.user_id),
-                        "message_text": str(message_db_resp.message_text),
-                        "created_at": str(message_db_resp.created_at),
+                        "user": {
+                            "user_id": str(ticket_message.user_id),
+                            "name": str(user.name),
+                        },
+                        "message_id": str(ticket_message.message_id),
+                        "message_text": str(ticket_message.message_text),
+                        "created_at": str(ticket_message.created_at),
                     }
                 )
     except Exception:

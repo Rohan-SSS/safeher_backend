@@ -15,12 +15,33 @@
     poetry2nix,
     ...
   } @ inputs: let
-    inherit (poetry2nix.legacyPackages."x86_64-linux") mkPoetryEnv;
+    inherit (poetry2nix.legacyPackages."x86_64-linux") mkPoetryEnv overrides;
     pkgs = nixpkgs.legacyPackages."x86_64-linux";
 
     pythonEnv = mkPoetryEnv {
       # python = pkgs.python39;
       projectDir = ./.;
+      overrides = overrides.withDefaults (final: prev: {
+        tiktoken = prev.tiktoken.override {
+          preferWheel = true;
+        };
+
+        langsmith = prev.langsmith.override {
+          preferWheel = true;
+        };
+
+        numpy = prev.numpy.override {
+          preferWheel = true;
+        };
+
+        unstructured = prev.unstructured.override {
+          preferWheel = true;
+        };
+
+        pinecone-client = prev.pinecone-client.override {
+          preferWheel = true;
+        };
+      });
       # preferWheels = true;
     };
     devshell = devenv.lib.mkShell {

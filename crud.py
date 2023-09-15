@@ -48,10 +48,18 @@ def create_community_chat_message(
         chat_message = models.CommunityChatMessage(
             message_text=message.message_text, user_id=message.user_id
         )
+
         db.add(chat_message)
         db.commit()
         db.refresh(chat_message)
-        return chat_message
+
+        user = (
+            db.query(models.User)
+            .filter(models.User.user_id == chat_message.user_id)
+            .one()
+        )
+
+        return chat_message, user
     except Exception as exc:
         # Handle any other unexpected errors
         db.rollback()
@@ -160,7 +168,14 @@ def create_ticket_message(db: Session, message: schemas.TicketChatMessageCreate)
         db.add(ticket_message)
         db.commit()
         db.refresh(ticket_message)
-        return ticket_message
+
+        user = (
+            db.query(models.User)
+            .filter(models.User.user_id == ticket_message.user_id)
+            .one()
+        )
+
+        return ticket_message, user
     except Exception as exc:
         # Handle any other unexpected errors
         db.rollback()
