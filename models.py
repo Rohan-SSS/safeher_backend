@@ -1,6 +1,7 @@
 from sqlalchemy import (
     TIMESTAMP,
     Column,
+    Float,
     ForeignKey,
     Integer,
     String,
@@ -51,7 +52,22 @@ class Ticket(Base):
     user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     teacher_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     is_open = Column(BOOLEAN, default=True, nullable=False)
+    is_anonymous = Column(BOOLEAN, default=False, nullable=False)
     ticket_chat_messages = relationship("TicketChatMessage", backref="ticket")
+
+    reports = relationship(
+        "TicketReport", backref="ticket", foreign_keys="[TicketReport.ticket_id]"
+    )
+
+
+class TicketReport(Base):
+    __tablename__ = "ticket_reports"
+
+    report_id = Column(Integer, primary_key=True)
+    ticket_id = Column(Integer, ForeignKey("tickets.ticket_id"), nullable=False)
+    report_content = Column(Text, nullable=False)
+    lat = Column(Float(precision=53), nullable=False)
+    long = Column(Float(precision=53), nullable=False)
 
 
 class TicketChatMessage(Base):

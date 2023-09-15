@@ -145,10 +145,10 @@ def login_user(user: schemas.UserLogin, db: Session = Depends(get_db)):
 
 
 @app.post("/tickets/create/")
-def create_ticket(ticket: schemas.TicketBase, db: Session = Depends(get_db)):
+def create_ticket(ticket: schemas.TicketCreate, db: Session = Depends(get_db)):
     teacher_id = crud.get_user_with_min_open_tickets(db)
     if teacher_id:
-        return crud.create_ticket(db, ticket.user_id, teacher_id)
+        return crud.create_ticket(db, ticket, teacher_id)
 
     raise HTTPException(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

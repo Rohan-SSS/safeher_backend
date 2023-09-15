@@ -30,10 +30,13 @@ class User(UserBase):
 # Ticket
 class TicketBase(BaseModel):
     user_id: int
+    is_anonymous: bool
 
 
 class TicketCreate(TicketBase):
-    pass
+    report_content: str
+    lat: float
+    long: float
 
 
 class Ticket(TicketBase):
@@ -86,15 +89,17 @@ class ChatbotRequest(BaseModel):
 
 class ChatbotResponse(BaseModel):
     response: str
-    
-    
+
+
 class Center(BaseModel):
     latitude: float
     longitude: float
 
+
 class Area(BaseModel):
     center: Center
     radius: int
+
 
 class Markers(BaseModel):
     markers: List[Area]
