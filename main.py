@@ -101,7 +101,7 @@ async def ticket_chat_endpoint(
             for client in ticket_chats[ticket_id]:
                 await client.send_json(
                     {
-                        "ticket_id": str(message_db_resp.ticket_id),
+                        "message_id": str(message_db_resp.message_id),
                         "user_id": str(message_db_resp.user_id),
                         "message_text": str(message_db_resp.message_text),
                         "created_at": str(message_db_resp.created_at),
