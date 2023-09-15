@@ -1,4 +1,4 @@
-from typing import Dict, Set, List
+from typing import Dict, Set
 import bcrypt
 from fastapi import (
     FastAPI,
@@ -14,6 +14,8 @@ import models, schemas, crud, chatBot, mapMarkers
 from schemas import *
 
 from database import SessionLocal, engine
+
+
 
 models.Base.metadata.create_all(bind=engine)
 
