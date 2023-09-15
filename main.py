@@ -15,8 +15,6 @@ from schemas import *
 
 from database import SessionLocal, engine
 
-
-
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(swagger_ui_parameters={"syntaxHighlight": True})
@@ -105,7 +103,7 @@ async def ticket_chat_endpoint(
                     {
                         "ticket_id": str(message_db_resp.ticket_id),
                         "user_id": str(message_db_resp.user_id),
-                        "message": str(message_db_resp.message_text),
+                        "message_text": str(message_db_resp.message_text),
                         "created_at": str(message_db_resp.created_at),
                     }
                 )
