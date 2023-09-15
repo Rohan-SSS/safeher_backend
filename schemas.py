@@ -83,6 +83,12 @@ class CommunityChatMessage(CommunityChatMessageBase):
         from_attributes = True
 
 
+class SOSRequest(BaseModel):
+    user_id: int
+    lat: float
+    long: float
+
+
 class ChatbotRequest(BaseModel):
     message: str
 

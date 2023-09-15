@@ -69,6 +69,14 @@ def create_community_chat_message(
         )
 
 
+def update_sos_chat_message(db: Session, message_id: int):
+    return (
+        db.query(models.CommunityChatMessage)
+        .filter(models.CommunityChatMessage.message_id == message_id)
+        .update({"message_text": "RESOLVED"})
+    )
+
+
 def get_community_chat_messages(db: Session):
     return db.query(models.CommunityChatMessage).all()
 

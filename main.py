@@ -205,6 +205,71 @@ def chat_with_bot(request: ChatbotRequest):
     return {"response": response_message}
 
 
+sos_requests: Dict[int, int] = {}
+
+
+@app.post("/sos/create")
+async def create_sos(request: schemas.SOSRequest, db: Session = Depends(get_db)):
+    user = crud.get_user(db, user_id=request.user_id)
+    try:
+        if user:
+            name = str(user.name)
+            phone_number = str(user.phone_number)
+            map_link = f"https://www.google.com/maps/search/?api=1&query={request.lat},{request.long}"
+
+            message = f"""
+Urgent! Need Help Now 🆘
+
+Hey everyone,
+
+I'm in a tough spot and need assistance ASAP.
+
+📍 Location: {map_link}
+
+If anyone's nearby, please come to help.
+
+Thanks,
+{name}
+{phone_number}
+    """
+
+            chat_message, _ = crud.create_community_chat_message(
+                db,
+                message=schemas.CommunityChatMessageCreate(
+                    message_text=message, user_id=request.user_id
+                ),
+            )
+
+            sos_requests.setdefault(request.user_id, int(str(chat_message.message_id)))
+
+            # Send Message to any connected clients to room
+            for client in clients:
+                await client.send_json(
+                    {
+                        "user": {
+                            "user_id": str(chat_message.user_id),
+                            "name": str(user.name),
+                        },
+                        "message_id": str(chat_message.message_id),
+                        "message_text": str(chat_message.message_text),
+                        "created_at": str(chat_message.created_at),
+                    }
+                )
+            return {"response": "success"}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"some error happened: {exc}")
+
+
+@app.patch("/sos/close/{user_id}")
+def close_sos(user_id: int, db: Session = Depends(get_db)):
+    message_id = sos_requests.get(user_id)
+    if message_id is None:
+        raise HTTPException(status_code=400, detail="no sos open found for user")
+
+    id = crud.update_sos_chat_message(db, message_id)
+    return {"response": f"success: {id}"}
+
+
 @app.get("/areas/", response_model=Markers)
 async def get_areas():
     markers_data = mapMarkers.mapMarkers()
