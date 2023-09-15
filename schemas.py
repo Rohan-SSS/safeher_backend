@@ -1,5 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel
+from typing import List
 
 
 class UserBase(BaseModel):
@@ -85,3 +86,15 @@ class ChatbotRequest(BaseModel):
 
 class ChatbotResponse(BaseModel):
     response: str
+    
+    
+class Center(BaseModel):
+    latitude: float
+    longitude: float
+
+class Area(BaseModel):
+    center: Center
+    radius: int
+
+class Markers(BaseModel):
+    markers: List[Area]

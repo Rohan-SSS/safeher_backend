@@ -1,4 +1,4 @@
-from typing import Dict, Set
+from typing import Dict, Set, List
 import bcrypt
 from fastapi import (
     FastAPI,
@@ -9,17 +9,16 @@ from fastapi import (
 )
 from sqlalchemy.orm import Session
 
-import models, schemas, crud, chatBot
+import models, schemas, crud, chatBot, mapMarkers
 
 from schemas import *
 
 from database import SessionLocal, engine
 
-
-
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(swagger_ui_parameters={"syntaxHighlight": True})
+
 
 # Dependency
 def get_db():
@@ -200,3 +199,7 @@ def chat_with_bot(request: ChatbotRequest):
     return {"response": response_message}
 
 
+@app.get("/areas/", response_model=Markers)
+async def get_areas():
+    markers_data = mapMarkers.mapMarkers()
+    return {"markers": markers_data}
