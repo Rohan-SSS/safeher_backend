@@ -73,5 +73,3 @@ points = [
     {"latitude": 28.799015, "longitude": 77.54144}
     # ... add more points as needed
 ]
-
-print(group_points(points))

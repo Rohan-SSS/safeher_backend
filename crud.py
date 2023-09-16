@@ -247,7 +247,7 @@ def close_sos(db: Session, user_id: int):
         )
     return (
         db.query(models.SOS)
-        .filter(models.SOS.id == sos.sos_id)
+        .filter(models.SOS.sos_id == sos.sos_id)
         .update({"is_open": False})
     )
 
