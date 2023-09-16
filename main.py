@@ -145,7 +145,7 @@ def login_user(user: schemas.UserLogin, db: Session = Depends(get_db)):
     return db_user
 
 
-@app.post("/tickets/create/", response_model=schemas.Ticket)
+@app.post("/tickets/create/")
 def create_ticket(ticket: schemas.TicketCreate, db: Session = Depends(get_db)):
     teacher_id = crud.get_user_with_min_open_tickets(db)
     if teacher_id:
@@ -171,9 +171,7 @@ def close_ticket(ticket_id: int, db: Session = Depends(get_db)):
     return crud.close_ticket(db, ticket_id)
 
 
-@app.get(
-    "/tickets/messages/{ticket_id}", response_model=list[schemas.TicketChatMessage]
-)
+@app.get("/tickets/messages/{ticket_id}")
 def get_ticket_messages(ticket_id: int, db: Session = Depends(get_db)):
     ticket = crud.get_ticket(db, ticket_id)
     if ticket is None:
