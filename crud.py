@@ -78,7 +78,22 @@ def update_sos_chat_message(db: Session, message_id: int):
 
 
 def get_community_chat_messages(db: Session):
-    return db.query(models.CommunityChatMessage).all()
+    resp = []
+    chats = db.query(models.CommunityChatMessage).all()
+    for chat in chats:
+        user = db.query(models.User).filter(models.User.user_id == chat.user_id).one()
+
+        chat_details = {
+            "user": {
+                "user_id": str(chat.user_id),
+                "name": str(user.name),
+            },
+            "message_id": str(chat.message_id),
+            "message_text": str(chat.message_text),
+            "created_at": str(chat.created_at),
+        }
+        resp.append(chat_details)
+    return resp
 
 
 def get_user_with_min_open_tickets(db: Session):
@@ -125,7 +140,7 @@ def create_ticket(db: Session, ticket: schemas.TicketCreate, teacher_id: int):
 
         # Create a message by user with the report
         create_ticket_message(db, message)
-        return ticket
+        return ticket_model
     except Exception as exc:
         # Handle any other unexpected errors
         db.rollback()
@@ -201,3 +216,41 @@ def create_ticket_message(db: Session, message: schemas.TicketChatMessageCreate)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
         )
+
+
+def create_sos(db: Session, sos: schemas.SOSRequest):
+    try:
+        sos = models.SOS(user_id=sos.user_id, lat=sos.lat, long=sos.long, is_open=True)
+        db.add(sos)
+        db.commit()
+        db.refresh(sos)
+        return sos
+    except Exception as exc:
+        # Handle any other unexpected errors
+        db.rollback()
+        print(exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
+        )
+
+
+def close_sos(db: Session, user_id: int):
+    sos = (
+        db.query(models.SOS)
+        .filter(models.SOS.user_id == user_id)
+        .filter(models.SOS.is_open == True)
+        .one_or_none()
+    )
+    if sos is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="No Open SOS Found"
+        )
+    return (
+        db.query(models.SOS)
+        .filter(models.SOS.id == sos.sos_id)
+        .update({"is_open": False})
+    )
+
+
+def get_sos(db: Session):
+    return db.query(models.SOS).all()

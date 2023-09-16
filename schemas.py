@@ -39,7 +39,7 @@ class TicketCreate(TicketBase):
     long: float
 
 
-class Ticket(TicketBase):
+class Ticket(TicketCreate):
     ticket_id: int
     teacher_id: int
     is_open: bool
@@ -109,3 +109,18 @@ class Area(BaseModel):
 
 class Markers(BaseModel):
     markers: List[Area]
+
+
+class UserSchema(BaseModel):
+    user_id: str
+    name: str
+
+
+class ChatMessageSchema(BaseModel):
+    user: UserSchema
+    message_text: str
+    message_id: str
+    created_at: str
+
+    class Config:
+        from_attributes = True

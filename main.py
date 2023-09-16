@@ -144,7 +144,7 @@ def login_user(user: schemas.UserLogin, db: Session = Depends(get_db)):
     return db_user
 
 
-@app.post("/tickets/create/")
+@app.post("/tickets/create/", response_model=schemas.Ticket)
 def create_ticket(ticket: schemas.TicketCreate, db: Session = Depends(get_db)):
     teacher_id = crud.get_user_with_min_open_tickets(db)
     if teacher_id:
@@ -183,7 +183,7 @@ def get_ticket_messages(ticket_id: int, db: Session = Depends(get_db)):
     return crud.get_ticket_messages(db, ticket_id)
 
 
-@app.get("/tickets/{user_id}", response_model=list[schemas.Ticket])
+@app.get("/tickets/{user_id}")
 def read_open_user_tickets(user_id: int, db: Session = Depends(get_db)):
     return crud.get_open_user_tickets(db, user_id)
 
@@ -194,7 +194,7 @@ def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return users
 
 
-@app.get("/community_chat/messages/", response_model=list[schemas.CommunityChatMessage])
+@app.get("/community_chat/messages/", response_model=List[schemas.ChatMessageSchema])
 def get_community_chat_messages(db: Session = Depends(get_db)):
     return crud.get_community_chat_messages(db)
 
@@ -203,9 +203,6 @@ def get_community_chat_messages(db: Session = Depends(get_db)):
 def chat_with_bot(request: ChatbotRequest):
     response_message = chatBot.get_answer(request.message)
     return {"response": response_message}
-
-
-sos_requests: Dict[int, int] = {}
 
 
 @app.post("/sos/create")
@@ -240,8 +237,6 @@ Thanks,
                 ),
             )
 
-            sos_requests.setdefault(request.user_id, int(str(chat_message.message_id)))
-
             # Send Message to any connected clients to room
             for client in clients:
                 await client.send_json(
@@ -255,19 +250,21 @@ Thanks,
                         "created_at": str(chat_message.created_at),
                     }
                 )
-            return {"response": "success"}
+
+            return crud.create_sos(db, request)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"some error happened: {exc}")
 
 
 @app.patch("/sos/close/{user_id}")
 def close_sos(user_id: int, db: Session = Depends(get_db)):
-    message_id = sos_requests.get(user_id)
-    if message_id is None:
-        raise HTTPException(status_code=400, detail="no sos open found for user")
+    id = crud.close_sos(db, user_id)
+    return {"respone": f"success, updated id ${id}"}
 
-    id = crud.update_sos_chat_message(db, message_id)
-    return {"response": f"success: {id}"}
+
+@app.get("/sos/")
+def get_sos(db: Session = Depends(get_db)):
+    return crud.get_sos(db)
 
 
 @app.get("/areas/", response_model=Markers)
