@@ -88,6 +88,7 @@ def get_community_chat_messages(db: Session):
                 "user_id": str(chat.user_id),
                 "name": str(user.name),
             },
+            "message_id": str(chat.message_id),
             "message_text": str(chat.message_text),
             "created_at": str(chat.created_at),
         }
@@ -233,4 +234,23 @@ def create_sos(db: Session, sos: schemas.SOSRequest):
         )
 
 
-# def close_sos(db: Session: sos_id)
+def close_sos(db: Session, user_id: int):
+    sos = (
+        db.query(models.SOS)
+        .filter(models.SOS.user_id == user_id)
+        .filter(models.SOS.is_open == True)
+        .one_or_none()
+    )
+    if sos is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="No Open SOS Found"
+        )
+    return (
+        db.query(models.SOS)
+        .filter(models.SOS.id == sos.sos_id)
+        .update({"is_open": False})
+    )
+
+
+def get_sos(db: Session):
+    return db.query(models.SOS).all()

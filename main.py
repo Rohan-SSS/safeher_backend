@@ -205,9 +205,6 @@ def chat_with_bot(request: ChatbotRequest):
     return {"response": response_message}
 
 
-sos_requests: Dict[int, int] = {}
-
-
 @app.post("/sos/create")
 async def create_sos(request: schemas.SOSRequest, db: Session = Depends(get_db)):
     user = crud.get_user(db, user_id=request.user_id)
@@ -240,8 +237,6 @@ Thanks,
                 ),
             )
 
-            sos_requests.setdefault(request.user_id, int(str(chat_message.message_id)))
-
             # Send Message to any connected clients to room
             for client in clients:
                 await client.send_json(
@@ -255,19 +250,21 @@ Thanks,
                         "created_at": str(chat_message.created_at),
                     }
                 )
-            return {"response": "success"}
+
+            return crud.create_sos(db, request)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"some error happened: {exc}")
 
 
 @app.patch("/sos/close/{user_id}")
 def close_sos(user_id: int, db: Session = Depends(get_db)):
-    message_id = sos_requests.get(user_id)
-    if message_id is None:
-        raise HTTPException(status_code=400, detail="no sos open found for user")
+    id = crud.close_sos(db, user_id)
+    return {"respone": f"success, updated id ${id}"}
 
-    id = crud.update_sos_chat_message(db, message_id)
-    return {"response": f"success: {id}"}
+
+@app.get("/sos/")
+def get_sos(db: Session = Depends(get_db)):
+    return crud.get_sos(db)
 
 
 @app.get("/areas/", response_model=Markers)

@@ -119,6 +119,7 @@ class UserSchema(BaseModel):
 class ChatMessageSchema(BaseModel):
     user: UserSchema
     message_text: str
+    message_id: str
     created_at: str
 
     class Config:
