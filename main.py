@@ -144,7 +144,7 @@ def login_user(user: schemas.UserLogin, db: Session = Depends(get_db)):
     return db_user
 
 
-@app.post("/tickets/create/")
+@app.post("/tickets/create/", response_model=schemas.Ticket)
 def create_ticket(ticket: schemas.TicketCreate, db: Session = Depends(get_db)):
     teacher_id = crud.get_user_with_min_open_tickets(db)
     if teacher_id:

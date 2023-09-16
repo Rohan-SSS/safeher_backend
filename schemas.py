@@ -34,16 +34,15 @@ class TicketBase(BaseModel):
 
 
 class TicketCreate(TicketBase):
-    pass
-
-
-class Ticket(TicketBase):
-    ticket_id: int
-    teacher_id: int
-    is_open: bool
     report_content: str
     lat: float
     long: float
+
+
+class Ticket(TicketCreate):
+    ticket_id: int
+    teacher_id: int
+    is_open: bool
 
     class Config:
         from_attributes = True

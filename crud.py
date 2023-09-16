@@ -119,7 +119,7 @@ def get_user_with_min_open_tickets(db: Session):
         return None
 
 
-def create_ticket(db: Session, ticket: schemas.Ticket, teacher_id: int):
+def create_ticket(db: Session, ticket: schemas.TicketCreate, teacher_id: int):
     try:
         ticket_model = models.Ticket(
             user_id=ticket.user_id,
@@ -139,7 +139,7 @@ def create_ticket(db: Session, ticket: schemas.Ticket, teacher_id: int):
 
         # Create a message by user with the report
         create_ticket_message(db, message)
-        return ticket
+        return ticket_model
     except Exception as exc:
         # Handle any other unexpected errors
         db.rollback()
