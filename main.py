@@ -183,7 +183,7 @@ def get_ticket_messages(ticket_id: int, db: Session = Depends(get_db)):
     return crud.get_ticket_messages(db, ticket_id)
 
 
-@app.get("/tickets/{user_id}", response_model=list[schemas.Ticket])
+@app.get("/tickets/{user_id}")
 def read_open_user_tickets(user_id: int, db: Session = Depends(get_db)):
     return crud.get_open_user_tickets(db, user_id)
 

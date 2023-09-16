@@ -29,6 +29,8 @@ class User(Base):
         foreign_keys="[CommunityChatMessage.user_id]",
     )
     tickets = relationship("Ticket", backref="user", foreign_keys="[Ticket.user_id]")
+
+    sos = relationship("SOS", backref="user", foreign_keys="[SOS.user_id]")
     ticket_chat_messages = relationship(
         "TicketChatMessage",
         foreign_keys="[TicketChatMessage.user_id]",
@@ -43,6 +45,15 @@ class CommunityChatMessage(Base):
     user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     message_text = Column(Text, nullable=False)
     created_at = Column("created_at", TIMESTAMP, server_default=func.now())
+
+
+class SOS(Base):
+    __tablename__ = "sos"
+    sos_id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
+    lat = Column(Float(precision=53), nullable=False)
+    long = Column(Float(precision=53), nullable=False)
+    is_open = Column(BOOLEAN, default=True, nullable=False)
 
 
 class Ticket(Base):

@@ -215,3 +215,22 @@ def create_ticket_message(db: Session, message: schemas.TicketChatMessageCreate)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
         )
+
+
+def create_sos(db: Session, sos: schemas.SOSRequest):
+    try:
+        sos = models.SOS(user_id=sos.user_id, lat=sos.lat, long=sos.long, is_open=True)
+        db.add(sos)
+        db.commit()
+        db.refresh(sos)
+        return sos
+    except Exception as exc:
+        # Handle any other unexpected errors
+        db.rollback()
+        print(exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
+        )
+
+
+# def close_sos(db: Session: sos_id)
