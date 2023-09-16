@@ -39,7 +39,7 @@ class TicketCreate(TicketBase):
     long: float
 
 
-class Ticket(TicketCreate):
+class Ticket(TicketBase):
     ticket_id: int
     teacher_id: int
     is_open: bool

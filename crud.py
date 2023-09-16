@@ -140,6 +140,7 @@ def create_ticket(db: Session, ticket: schemas.TicketCreate, teacher_id: int):
 
         # Create a message by user with the report
         create_ticket_message(db, message)
+
         return ticket_model
     except Exception as exc:
         # Handle any other unexpected errors
