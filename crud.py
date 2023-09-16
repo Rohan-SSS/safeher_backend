@@ -253,4 +253,4 @@ def close_sos(db: Session, user_id: int):
 
 
 def get_sos(db: Session):
-    return db.query(models.SOS).all()
+    return db.query(models.SOS).filter(models.SOS.is_open == True).all()
