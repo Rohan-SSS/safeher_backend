@@ -78,7 +78,21 @@ def update_sos_chat_message(db: Session, message_id: int):
 
 
 def get_community_chat_messages(db: Session):
-    return db.query(models.CommunityChatMessage).all()
+    resp = []
+    chats = db.query(models.CommunityChatMessage).all()
+    for chat in chats:
+        user = db.query(models.User).filter(models.User.user_id == chat.user_id).one()
+
+        chat_details = {
+            "user": {
+                "user_id": str(chat.user_id),
+                "name": str(user.name),
+            },
+            "message_text": str(chat.message_text),
+            "created_at": str(chat.created_at),
+        }
+        resp.append(chat_details)
+    return resp
 
 
 def get_user_with_min_open_tickets(db: Session):
@@ -105,7 +119,7 @@ def get_user_with_min_open_tickets(db: Session):
         return None
 
 
-def create_ticket(db: Session, ticket: schemas.TicketCreate, teacher_id: int):
+def create_ticket(db: Session, ticket: schemas.Ticket, teacher_id: int):
     try:
         ticket_model = models.Ticket(
             user_id=ticket.user_id,

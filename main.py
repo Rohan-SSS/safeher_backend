@@ -194,7 +194,7 @@ def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return users
 
 
-@app.get("/community_chat/messages/", response_model=list[schemas.CommunityChatMessage])
+@app.get("/community_chat/messages/", response_model=List[schemas.ChatMessageSchema])
 def get_community_chat_messages(db: Session = Depends(get_db)):
     return crud.get_community_chat_messages(db)
 
