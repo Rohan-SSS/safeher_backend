@@ -254,3 +254,22 @@ def close_sos(db: Session, user_id: int):
 
 def get_sos(db: Session):
     return db.query(models.SOS).filter(models.SOS.is_open == True).all()
+
+
+def get_all_coords(db: Session):
+    soss = db.query(models.SOS).all()
+    reports = db.query(models.TicketReport).all()
+
+    coords = []
+    for sos in soss:
+        coord = {"latitude": float(str(sos.lat)), "longitude": float(str(sos.long))}
+        coords.append(coord)
+
+    for report in reports:
+        coord = {
+            "latitude": float(str(report.lat)),
+            "longitude": float(str(report.long)),
+        }
+        coords.append(coord)
+
+    return coords

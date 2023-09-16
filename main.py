@@ -14,6 +14,7 @@ import models, schemas, crud, chatBot, mapMarkers
 from schemas import *
 
 from database import SessionLocal, engine
+import utils
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -268,6 +269,6 @@ def get_sos(db: Session = Depends(get_db)):
 
 
 @app.get("/areas/", response_model=Markers)
-async def get_areas():
-    markers_data = mapMarkers.mapMarkers()
-    return {"markers": markers_data}
+async def get_areas(db: Session = Depends(get_db)):
+    coords = crud.get_all_coords(db)
+    return {"markers": utils.group_points(coords)}
