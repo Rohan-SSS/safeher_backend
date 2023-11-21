@@ -8,7 +8,6 @@ from fastapi import (
     status,
 )
 from sqlalchemy.orm import Session
-from mangum import Mangum
 from fastapi.middleware.cors import CORSMiddleware
 import models, schemas, crud, chatBot, mapMarkers
 
@@ -29,7 +28,6 @@ app.add_middleware(
     allow_headers=["*"],  
 )
 
-handler = Mangum(app)
 
 # Dependency
 def get_db():
