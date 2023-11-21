@@ -2,5 +2,5 @@ fastapi
 uvicorn
 sqlalchemy 
 bcrypt
-psycopg2
+psycopg2-binary
 langchain

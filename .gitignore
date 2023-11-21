@@ -1,5 +1,6 @@
 .envrc
 .devenv
 __pycache__
+/venv
 
 poetry.lock
