@@ -1,4 +1,5 @@
 from typing import Dict, Set
+import uvicorn
 import bcrypt
 from fastapi import (
     FastAPI,
@@ -278,3 +279,11 @@ def get_sos(db: Session = Depends(get_db)):
 async def get_areas(db: Session = Depends(get_db)):
     coords = crud.get_all_coords(db)
     return {"markers": utils.group_points(coords)}
+
+if __name__ == "__main__":
+    try:
+        port = os.environ.get("PORT", "5000")
+        port = int(port)
+    except ValueError:
+        port = 5000
+    uvicorn.run("main:app", host='0.0.0.0', port=port, log_level="info")
