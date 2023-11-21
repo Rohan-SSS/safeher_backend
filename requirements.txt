@@ -4,3 +4,4 @@ sqlalchemy
 bcrypt
 psycopg2-binary
 langchain
+pinecone-client
